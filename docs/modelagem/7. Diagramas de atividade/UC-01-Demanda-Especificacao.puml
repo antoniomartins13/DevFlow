@@ -1,0 +1,45 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_01
+title UC-01 — Preparar demanda e especificação
+skinparam shadowing false
+
+|Equipe|
+start
+:Informar problema, objetivo\ne projeto;
+|DevFlow|
+:Registrar tarefa, escopo,\nrestrições e dependências;
+:Identificar partes dependentes\ne partes independentes;
+|Equipe e IA de apoio|
+repeat
+  :Preparar especificação e\ncritérios de aceite;
+  |DevFlow|
+  :Conferir clareza, bordas\ne impacto esperado;
+  if (Há lacunas críticas?) then (Sim)
+    :Solicitar esclarecimentos objetivos;
+    |Equipe|
+    :Responder aos esclarecimentos;
+    |DevFlow|
+    if (Resposta suficiente recebida?) then (Não)
+      :Registrar pendência e\naguardar esclarecimento;
+      stop
+    else (Sim)
+    endif
+  else (Não)
+  endif
+  |Equipe e IA de apoio|
+repeat while (É necessário revisar a especificação?) is (Sim) not (Não)
+
+|DevFlow|
+:Versionar especificação e\nregistrar dependências pendentes;
+:Encaminhar para UC-02;
+stop
+
+legend bottom
+  Preparar a especificação não autoriza implementação.
+  Partes independentes avançam somente com autorização própria.
+  Proposta originada por IA exige a mesma avaliação.
+  Fim deste diagrama pode significar espera, não tarefa concluída.
+endlegend
+@enduml

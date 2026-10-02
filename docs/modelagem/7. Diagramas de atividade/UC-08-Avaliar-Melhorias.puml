@@ -1,0 +1,107 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_08_Comparacao
+title UC-08 — Pesquisa e comparação
+skinparam shadowing false
+
+|Pesquisador de IA|
+start
+:Registrar gargalo e candidato;\nverificar origem, licença e compatibilidade;
+|DevFlow|
+if (Candidato é pertinente e não duplicado?) then (Não)
+  :Arquivar/rejeitar com justificativa;
+  stop
+else (Sim)
+endif
+|Pesquisador de IA|
+:Preparar hipótese, métricas,\nprotocolo, custo e reversão;
+|DevFlow|
+if (Baseline e limites estão disponíveis?) then (Não)
+  :Adiar experimento;\npreservar tarefas prioritárias;
+  stop
+else (Sim)
+endif
+:Apresentar pedido de experimento;
+|Responsável|
+:Decidir sobre o experimento limitado;
+|DevFlow|
+if (Autorização válida e orçamento disponível?) then (Não)
+  :Registrar espera, adiamento ou rejeição;
+  stop
+else (Sim)
+endif
+:Executar comparação controlada;\nincluir falhas, retrabalho e consumo;
+|Avaliador independente|
+:Conferir evidências, limitações\ne trocas entre métricas;
+if (Ganho demonstrado e qualidade preservada?) then (Não)
+  :Recomendar rejeitar ou adiar;\nregistrar resultado inconclusivo quando pertinente;
+  |DevFlow|
+  :Registrar resultado e comunicar\nsem alterar configuração vigente;
+else (Sim)
+  :Preparar recomendação e evidências;
+  |DevFlow|
+  :Encaminhar à decisão de adoção\nno segundo diagrama do UC-08;
+endif
+stop
+
+legend bottom
+  Pesquisa começa após validação real inicial e baseline.
+  Experimento autorizado não equivale a adoção aprovada.
+  Simplificar/remover recursos também pode ser melhoria.
+  Comparações reais são separadas do CI com agentes falsos.
+endlegend
+@enduml
+
+@startuml UC_08_Adocao
+title UC-08 — Decisão e observação da melhoria
+skinparam shadowing false
+
+|DevFlow|
+start
+:Receber proposta com\navaliação independente;
+:Preparar MR pelo fluxo de tarefa\nquando houver mudança;
+:Apresentar ganho, limitações,\ncusto, manutenção e reversão;
+|Responsável|
+:Decidir adotar, adiar ou rejeitar;
+|DevFlow|
+if (Adoção aprovada?) then (Não)
+  :Registrar adiamento/rejeição;\nmanter configuração vigente;
+  stop
+else (Sim)
+endif
+if (MR e verificações exigidos estão aprovados?) then (Não)
+  :Manter adoção pendente;\nnão aplicar alteração;
+  stop
+else (Sim)
+endif
+:Aplicar configuração aprovada\na um conjunto limitado de tarefas;
+:Observar ganho, qualidade,\nconsumo e intervenções;
+if (Ganho se sustenta?) then (Sim)
+  |Responsável|
+  :Decidir sobre ampliação;
+  |DevFlow|
+  if (Ampliação autorizada?) then (Sim)
+    :Ampliar uso e registrar adoção;
+  else (Não)
+    :Manter escopo limitado aprovado\nou registrar nova decisão;
+  endif
+else (Não)
+  :Bloquear ampliação e apresentar\nproblema e opção de retorno;
+  |Responsável|
+  :Decidir retorno ou reavaliação;
+  |DevFlow|
+  if (Retorno autorizado e disponível?) then (Sim)
+    :Restaurar configuração anterior;\nregistrar reversão;
+  else (Não)
+    :Registrar bloqueio/pendência;\naguardar solução autorizada;
+  endif
+endif
+stop
+
+legend bottom
+  Novo modelo é candidato; não provoca troca silenciosa.
+  Adotar, ampliar e reverter respeitam as autorizações.
+  Não contratar API paga ou assinatura por descoberta de release.
+endlegend
+@enduml

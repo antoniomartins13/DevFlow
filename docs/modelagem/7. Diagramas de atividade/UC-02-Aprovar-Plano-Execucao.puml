@@ -1,0 +1,56 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_02
+title UC-02 — Aprovar plano e execução
+skinparam shadowing false
+
+|DevFlow|
+start
+if (Aprovação dos critérios é exigida?) then (Sim)
+  :Solicitar decisão sobre critérios;
+  |Responsável|
+  :Avaliar critérios;
+  |DevFlow|
+  if (Critérios aprovados por decisão válida?) then (Não)
+    :Registrar ajustes, rejeição\nou espera por decisão;
+    :Retornar ao UC-01 ou\nmanter tarefa pendente;
+    stop
+  else (Sim)
+  endif
+else (Não)
+endif
+
+|Planejador de IA|
+repeat
+  :Preparar plano, base, impacto\ne verificações;
+  :Preparar modelagem ou protótipo\nquando necessário;
+  |DevFlow|
+  :Apresentar pacote de decisão — CP1;
+  |Responsável|
+  :Avaliar plano e base;
+  |DevFlow|
+  :Conferir identidade, permissão\ne versão da decisão;
+  if (Decisão recebida e válida?) then (Não)
+    :Manter aguardando aprovação;
+    stop
+  else (Sim)
+  endif
+  |Planejador de IA|
+repeat while (Foram solicitados ajustes?) is (Sim) not (Não)
+
+|DevFlow|
+if (Plano e base aprovados?) then (Sim)
+  :Registrar autorização;
+  :Encaminhar para UC-03;
+else (Não)
+  :Registrar rejeição;\nimpedir implementação;
+endif
+stop
+
+legend bottom
+  Mudança do plano/base exige reavaliar a autorização.
+  Checkpoints adicionais seguem a política vigente.
+  Na Entrega -1, a admissão usa a lista "Pronto para IA".
+endlegend
+@enduml

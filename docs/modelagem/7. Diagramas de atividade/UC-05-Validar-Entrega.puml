@@ -1,0 +1,51 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_05
+title UC-05 — Validar entrega com roteiro de testes
+skinparam shadowing false
+
+|DevFlow|
+start
+:Conferir commit/build, revisão,\nverificações, roteiro e ambiente;
+if (Entrega pode ser validada?) then (Não)
+  :Registrar bloqueio;\nresolver preparação antes do pedido;
+  stop
+else (Sim)
+endif
+:Apresentar versão, URL, perfil,\ndados e resultados esperados;
+|Validador humano|
+:Consultar verificações já comprovadas;
+:Executar cenários humanos requeridos:\nfuncionalidade, bordas e regressões;
+:Registrar aprovado, reprovado,\nbloqueado ou não executado;
+|DevFlow|
+if (Foi confirmada falha ou regressão?) then (Sim)
+  :Registrar reprodução e evidência;
+  :Retornar ao UC-03;\nrepetir testes, revisão e validação afetados;
+  stop
+else (Não)
+endif
+if (Todos os cenários obrigatórios passaram?) then (Não)
+  :Manter validação pendente;\nregistrar o que falta ou está bloqueado;
+  stop
+else (Sim)
+endif
+|Responsável|
+:Registrar decisão do checkpoint;
+|DevFlow|
+if (Decisão é válida para a versão atual?) then (Não)
+  :Registrar pendência de decisão\nou mudança de versão;
+  :Reavaliar evidências e aprovações afetadas;
+else (Sim)
+  :Registrar validação aprovada;
+  :Encaminhar à decisão humana de merge,\ncondicionada aos demais gates;
+endif
+stop
+
+legend bottom
+  Cada cenário tem ações e resultado esperado observável.
+  Uma dimensão sem cenário aplicável exige justificativa.
+  Novo commit não herda aprovação automaticamente.
+  Merge exige revisão humana, CI verde e gates válidos.
+endlegend
+@enduml

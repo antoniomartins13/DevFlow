@@ -1,0 +1,43 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_06
+title UC-06 — Acompanhar tarefas e resultados
+skinparam shadowing false
+
+|Responsável ou equipe autorizada|
+start
+:Consultar tarefa ou abrir\nlink de uma notificação;
+|DevFlow|
+:Verificar permissão de acesso;
+if (Acesso autorizado?) then (Não)
+  :Negar consulta sem\nexpor dados restritos;
+  stop
+else (Sim)
+endif
+:Consultar estado e resultados registrados;
+if (Integrações estão disponíveis?) then (Sim)
+  :Reconciliar informações externas;
+else (Não)
+  :Identificar última atualização\ne indisponibilidade;
+endif
+:Apresentar fase, condição operacional,\nbloqueios e dependências;
+:Disponibilizar plano, decisões, MR,\nevidências e consumo conhecido;
+:Indicar próximo passo\ne quem precisa agir;
+|Responsável ou equipe autorizada|
+:Consultar detalhes pertinentes;
+|DevFlow|
+:Publicar atualizações relevantes\nnos canais configurados;
+if (Publicação foi confirmada?) then (Não)
+  :Registrar publicação pendente;\nreconciliar antes de repetir;
+else (Sim)
+  :Registrar envio confirmado;
+endif
+stop
+
+legend bottom
+  Dados desconhecidos são apresentados como desconhecidos.
+  Consultar ou receber um aviso não aprova uma etapa.
+  Falha de aviso só bloqueia a fase quando for gate obrigatório.
+endlegend
+@enduml

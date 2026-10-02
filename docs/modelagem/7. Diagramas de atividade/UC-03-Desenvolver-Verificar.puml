@@ -1,0 +1,52 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_03
+title UC-03 — Desenvolver e verificar a alteração
+skinparam shadowing false
+
+|DevFlow|
+start
+:Verificar autorização, dependências,\nlimites e execução anterior;
+if (Execução pode ser admitida?) then (Não)
+  :Registrar bloqueio e motivo;\naguardar resolução;
+  stop
+else (Sim)
+endif
+:Preparar ou reconciliar\nworktree e branch da tarefa;
+:Entregar ao executor o plano,\nas regras e o contexto necessário;
+|Executor de IA|
+:Implementar alteração autorizada;
+|DevFlow|
+if (Execução terminou com resultado conhecido?) then (Não)
+  :Preservar estado e evidências;\nencaminhar para reconciliação;
+  stop
+else (Sim)
+endif
+:Conferir escopo do diff e\nexecutar verificações obrigatórias;
+if (Escopo e verificações aprovados?) then (Não)
+  :Registrar falhas;\nbloquear abertura inicial do MR;
+  :Encaminhar para correção autorizada;
+  stop
+else (Sim)
+endif
+:Registrar commit, comandos,\nresultados e executor;
+|Executor de IA|
+:Preparar documentação pertinente\ne roteiro de validação;
+|DevFlow|
+:Preparar/publicar MR em draft\nconforme o gate autorizado;
+if (Etapa exigida do MR foi confirmada?) then (Não)
+  :Preservar artefatos;\nreconciliar com GitLab antes de repetir;
+  stop
+else (Sim)
+endif
+:Encaminhar commit e evidências\npara UC-04;
+stop
+
+legend bottom
+  Correções respeitam plano, autorização e limites.
+  Evidência de CI só é reutilizada se válida para commit/configuração.
+  Na Entrega -1, MR em draft abre após testes e antes da revisão.
+  Se um MR já existe, retomar sem duplicá-lo.
+endlegend
+@enduml

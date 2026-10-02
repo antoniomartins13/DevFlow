@@ -1,0 +1,50 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_04
+title UC-04 — Revisar a alteração
+skinparam shadowing false
+
+|DevFlow|
+start
+:Preparar contexto de revisão\nindependente da implementação;
+if (Requisitos, diff e evidências disponíveis?) then (Não)
+  :Registrar lacuna;\nmanter revisão bloqueada;
+  stop
+else (Sim)
+endif
+|Revisor de IA|
+:Analisar critérios, escopo,\ncorreção, riscos e efeitos indiretos;
+:Identificar testes removidos\nou enfraquecidos;
+:Conferir roteiro de funcionalidade,\nbordas e regressões;
+:Considerar evidências pertinentes\nde navegador e arquitetura;
+:Preparar parecer com achados,\nimpacto e commit revisado;
+|DevFlow|
+if (Commit permanece o revisado?) then (Não)
+  :Invalidar conclusão afetada;\nretornar ao UC-03 para reavaliação;
+  stop
+else (Sim)
+endif
+:Registrar/publicar parecer\nconforme autorização;
+if (Há pendências bloqueantes?) then (Sim)
+  if (Correção está dentro do plano?) then (Sim)
+    :Retornar ao UC-03;\nexigir novos testes e revisão;
+  else (Não)
+    :Retornar ao UC-01/UC-02;\nreavaliar escopo e autorização;
+  endif
+else (Não)
+  if (Roteiro e ambiente estão prontos?) then (Sim)
+    :Encaminhar para UC-05;
+  else (Não)
+    :Registrar bloqueio de preparação;\nnão solicitar validação inexequível;
+  endif
+endif
+stop
+
+legend bottom
+  Parecer de IA não aprova merge.
+  Ausência de evidência é uma lacuna, não uma aprovação.
+  Browser Use complementa testes; Archify apoia comparação arquitetural.
+  Falha de publicação deve ser reconciliada sem duplicar comentários.
+endlegend
+@enduml

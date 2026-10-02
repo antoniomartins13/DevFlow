@@ -1,0 +1,55 @@
+' Modelo planejado; baseado na v0.2 e nos fluxos dos casos de uso.
+' Interrupções, bloqueios e retornos preservam estado e evidências.
+' stop encerra esta execução do caso de uso, não significa sucesso da tarefa.
+@startuml UC_07
+title UC-07 — Configurar e controlar as execuções
+skinparam shadowing false
+
+|Responsável|
+start
+:Selecionar projeto/configuração;
+|DevFlow|
+if (Responsável tem permissão?) then (Não)
+  :Negar mudança;
+  stop
+else (Sim)
+endif
+|Responsável|
+:Propor repositórios, verificações,\nexecutores por etapa e limites;
+|DevFlow|
+:Validar consistência, compatibilidade,\npermissões e capacidades;
+if (Configuração válida?) then (Não)
+  :Registrar erros;\nmanter configuração anterior;
+  stop
+else (Sim)
+endif
+if (Exige MR pelo fluxo de mudança?) then (Sim)
+  :Encaminhar mudança ao fluxo\nUC-01 a UC-05;
+  :Executar testes do DevFlow\ncom agentes e APIs simulados;
+  |Responsável|
+  :Revisar e decidir sobre o MR;
+  |DevFlow|
+  if (MR aprovado e CI verde?) then (Não)
+    :Manter mudança pendente/rejeitada;\nnão adotar configuração;
+    stop
+  else (Sim)
+  endif
+else (Não)
+  :Conferir autorização operacional\ne registrar decisão correspondente;
+endif
+:Identificar execuções afetadas\ne reavaliar gates necessários;
+if (Mudança pode ser aplicada agora?) then (Não)
+  :Adiar aplicação;\npreservar configuração vigente;
+else (Sim)
+  :Registrar configuração aprovada\ne sua versão;
+  :Aplicar controles às\nexecuções pertinentes;
+endif
+stop
+
+legend bottom
+  Configurar executor não autoriza todas as tarefas.
+  Segredos ficam separados dos documentos versionados.
+  Terceiros têm versão/origem fixadas e atualização por MR aprovado.
+  Entrega -1 usa máximo persistente de tarefas/dia.
+endlegend
+@enduml

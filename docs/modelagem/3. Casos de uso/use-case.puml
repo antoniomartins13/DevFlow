@@ -1,0 +1,33 @@
+@startuml
+left to right direction
+skinparam shadowing false
+skinparam linetype ortho
+
+actor "Equipe do projeto" as Equipe
+actor "Responsavel" as Responsavel
+actor "Executores de IA" as IA
+
+rectangle "DevFlow" {
+  usecase "Preparar demanda\ne especificação" as Demanda
+  usecase "Aprovar plano\ne execução" as Aprovar
+  usecase "Desenvolver e verificar\na alteração" as Desenvolver
+  usecase "Revisar a alteração" as Revisar
+  usecase "Validar entrega\ncom roteiro de testes" as Validar
+  usecase "Acompanhar tarefas\ne resultados" as Acompanhar
+  usecase "Configurar e controlar\nas execuções" as Configurar
+  usecase "Avaliar melhorias\ne novos modelos" as Melhorar
+}
+
+Equipe -- Demanda
+Equipe -- Validar
+
+Responsavel -- Aprovar
+Responsavel -- Validar
+Responsavel -- Acompanhar
+Responsavel -- Configurar
+Responsavel -- Melhorar
+
+Desenvolver -- IA
+Revisar -- IA
+Melhorar -- IA
+@enduml
